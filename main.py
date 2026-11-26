@@ -12,17 +12,26 @@ from pathlib import Path
 
 WORD = "recalculating"
 
+OUTPUT_PATH = Path("/output") / "entry.txt"
+
+
+def validate(word: str) -> str:
+    """Enforce the sealed gate: one word, 1-99 UTF-8 characters."""
+    if not word or word != word.strip():
+        raise ValueError("entry must not be empty or only whitespace")
+    if not (1 <= len(word) <= 99):
+        raise ValueError(f"entry must be 1-99 characters, got {len(word)}")
+    if len(word.split()) != 1:
+        raise ValueError(f"entry must be a single word: {word!r}")
+    return word
+
 
 def main() -> None:
-    """Write the single word to /output/entry.txt."""
-    # Gate check, same rule as the sealed scorer: 1-99 chars, one word.
-    if not (1 <= len(WORD) <= 99) or len(WORD.split()) != 1:
-        raise ValueError(f"entry must be a single word of 1-99 chars: {WORD!r}")
-    out_dir = Path("/output")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "entry.txt"
-    out_path.write_text(WORD, encoding="utf-8")
-    print(f"wrote {out_path} ({len(WORD)} characters)")
+    """Write the single validated word to /output/entry.txt."""
+    word = validate(WORD)
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(word, encoding="utf-8")
+    print(f"wrote {OUTPUT_PATH} ({len(word)} characters)")
 
 
 if __name__ == "__main__":
